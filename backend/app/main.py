@@ -1,4 +1,5 @@
 import os
+import json
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,23 +12,39 @@ app = FastAPI(
 )
 
 def _get_cors_origins() -> list[str]:
-    raw_origins = os.getenv("CORS_ORIGINS", "")
-    if raw_origins.strip():
-        return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
-
+    raw_origins = os.getenv("CORS_ORIGINS", "").strip()
+    
+    # Si es wildcard
+    if raw_origins == "*":
+        return ["*"]
+    
+    # Si tiene contenido, intentar parsear
+    if raw_origins:
+        # Intentar como JSON ["url1", "url2"]
+        try:
+            parsed = json.loads(raw_origins)
+            if isinstance(parsed, list):
+                return parsed
+        except json.JSONDecodeError:
+            pass
+        # Intentar como CSV url1,url2
+        return [o.strip() for o in raw_origins.split(",") if o.strip()]
+    
+    # Fallback local
     return [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
     ]
 
 
-# Configurar CORS
+# Configurar CORS — debe ir antes del router
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_get_cors_origins(),
     allow_credentials=False,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    max_age=3600,
 )
 
 # Incluir rutas
