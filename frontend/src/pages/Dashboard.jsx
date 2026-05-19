@@ -83,6 +83,19 @@ export default function Dashboard({ onNavigate }) {
     load()
   }, [source])
 
+  // Recalculate stats when dataset changes
+  useEffect(() => {
+    const exitosos = filteredDataset.filter((r) => r.resultado === 'Éxito').length
+    const tasaExito = filteredDataset.length > 0 ? (exitosos / filteredDataset.length) * 100 : 0
+    
+    setStats({
+      totalEstados: stats?.totalEstados || 0,
+      totalRecorridos: filteredDataset.length,
+      estadosFinales: stats?.estadosFinales || 0,
+      tasaExito,
+    })
+  }, [source, profileFilter, resultFilter, filteredDataset])
+
   const profiles = Array.from(new Set(dataset.map(d => d.perfil).filter(Boolean)))
   const results = Array.from(new Set(dataset.map(d => d.resultado).filter(Boolean)))
 
@@ -158,7 +171,7 @@ export default function Dashboard({ onNavigate }) {
           </div>
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Data Set Base</p>
-            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{stats?.totalRecorridos || 0} recorridos</p>
+            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{filteredDataset.length} recorridos</p>
           </div>
         </div>
 
@@ -190,15 +203,17 @@ export default function Dashboard({ onNavigate }) {
               </div>
             </div>
 
-            <div className="mt-4 text-sm text-slate-600">
-              {source === 'live' ? (
-                <div>
-                  Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de <strong>Live API</strong> tras aplicar filtros
-                </div>
-              ) : (
-                <div>
-                  Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de la <strong>simulación {new Date(savedList.find(s => String(s.id) === String(source))?.timestamp).toLocaleString()}</strong> tras aplicar filtros
-                </div>
+            <div className="mt-4 text-sm text-slate-600 min-h-[28px]">
+              {dataset.length > 0 && (
+                source === 'live' ? (
+                  <div>
+                    Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de <strong>Live API</strong> tras aplicar filtros
+                  </div>
+                ) : (
+                  <div>
+                    Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de la <strong>simulación {new Date(savedList.find(s => String(s.id) === String(source))?.timestamp).toLocaleString()}</strong> tras aplicar filtros
+                  </div>
+                )
               )}
             </div>
           </div>
