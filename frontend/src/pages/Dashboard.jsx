@@ -83,19 +83,6 @@ export default function Dashboard({ onNavigate }) {
     load()
   }, [source])
 
-  // Recalculate stats when dataset changes
-  useEffect(() => {
-    const exitosos = filteredDataset.filter((r) => r.resultado === 'Éxito').length
-    const tasaExito = filteredDataset.length > 0 ? (exitosos / filteredDataset.length) * 100 : 0
-    
-    setStats({
-      totalEstados: stats?.totalEstados || 0,
-      totalRecorridos: filteredDataset.length,
-      estadosFinales: stats?.estadosFinales || 0,
-      tasaExito,
-    })
-  }, [source, profileFilter, resultFilter, filteredDataset])
-
   const profiles = Array.from(new Set(dataset.map(d => d.perfil).filter(Boolean)))
   const results = Array.from(new Set(dataset.map(d => d.resultado).filter(Boolean)))
 
@@ -104,6 +91,21 @@ export default function Dashboard({ onNavigate }) {
     if (resultFilter && d.resultado !== resultFilter) return false
     return true
   })
+
+  const sourceInfo = (() => {
+    if (source === 'live') return 'Live API'
+    const selected = savedList.find((s) => String(s.id) === String(source))
+    if (!selected?.timestamp) return 'fuente seleccionada'
+    return `simulación ${new Date(selected.timestamp).toLocaleString()}`
+  })()
+
+  const sourceStats = (() => {
+    const total = dataset.length
+    const exitosos = filteredDataset.filter((r) => r.resultado === 'Éxito').length
+    const tasaExito = total > 0 ? (exitosos / total) * 100 : 0
+
+    return { total, exitosos, tasaExito }
+  })()
 
   if (loading) {
     return (
@@ -149,10 +151,10 @@ export default function Dashboard({ onNavigate }) {
             {stats?.totalEstados || 0} Estados
           </div>
           <div className="text-brand-50 text-xs font-semibold uppercase tracking-wide">
-            {stats?.totalRecorridos || 0} Recorridos
+            {sourceStats.total} Recorridos
           </div>
           <div className="text-brand-50 text-xs font-semibold uppercase tracking-wide">
-            {(stats?.tasaExito || 0).toFixed(1)}% Tasa Éxito
+            {sourceStats.tasaExito.toFixed(1)}% Tasa Éxito
           </div>
         </div>
       </div>
@@ -163,15 +165,15 @@ export default function Dashboard({ onNavigate }) {
         <div className="grid sm:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Abandono Base</p>
-            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{(100 - (stats?.tasaExito || 0)).toFixed(1)}%</p>
+            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{(100 - sourceStats.tasaExito).toFixed(1)}%</p>
           </div>
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Cobertura de Estados Finales</p>
-            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{stats?.estadosFinales || 0} / {stats?.totalEstados || 0}</p>
+            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{sourceStats.exitosos} / {sourceStats.total}</p>
           </div>
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Data Set Base</p>
-            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{filteredDataset.length} recorridos</p>
+            <p className="text-2xl font-display font-bold text-slate-900 mt-2">{sourceStats.total} recorridos</p>
           </div>
         </div>
 
@@ -205,15 +207,9 @@ export default function Dashboard({ onNavigate }) {
 
             <div className="mt-4 text-sm text-slate-600 min-h-[28px]">
               {dataset.length > 0 && (
-                source === 'live' ? (
-                  <div>
-                    Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de <strong>Live API</strong> tras aplicar filtros
-                  </div>
-                ) : (
-                  <div>
-                    Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de la <strong>simulación {new Date(savedList.find(s => String(s.id) === String(source))?.timestamp).toLocaleString()}</strong> tras aplicar filtros
-                  </div>
-                )
+                <div>
+                  Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de <strong>{sourceInfo}</strong> tras aplicar filtros
+                </div>
               )}
             </div>
           </div>
@@ -267,7 +263,7 @@ export default function Dashboard({ onNavigate }) {
         />
         <KPICard
           title="Tasa de Éxito"
-          value={`${(stats?.tasaExito || 0).toFixed(1)}%`}
+          value={`${sourceStats.tasaExito.toFixed(1)}%`}
           unit="usuarios"
           icon={Users}
           color="warning"
