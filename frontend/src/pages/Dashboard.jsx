@@ -297,19 +297,19 @@ export default function Dashboard({ onNavigate }) {
           </div>
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">⚡ Simulación Avanzada</h3>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Simulación Avanzada</h3>
               <p className="text-xs text-slate-600">Parametriza usuarios, pasos máximos y estado inicial con búsqueda de estados</p>
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">🔍 Diagnóstico Inteligente</h3>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Diagnóstico Inteligente</h3>
               <p className="text-xs text-slate-600">Identifica cuellos de botella y estados con alto abandono</p>
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">📊 Análisis Visual</h3>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Análisis Visual</h3>
               <p className="text-xs text-slate-600">Gráficos interactivos de resultados, matrices de transición y recorridos</p>
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">⚙️ Comparación Scenarios</h3>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Comparación de escenarios</h3>
               <p className="text-xs text-slate-600">Compara impacto de mejoras en reducción de abandonos</p>
             </div>
           </div>

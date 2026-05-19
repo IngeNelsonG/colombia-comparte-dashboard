@@ -94,12 +94,14 @@ npm install
 ### 3️⃣ Ejecutar la Aplicación
 
 **Terminal 1 - Backend**
+
 ```bash
 cd backend
 python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Terminal 2 - Frontend**
+
 ```bash
 cd frontend
 npm run dev
@@ -117,29 +119,34 @@ npm run dev
 ## 📊 Descripción de Características
 
 ### Dashboard Principal
+
 - KPI Cards con métricas en tiempo real
 - Información del proyecto y estadísticas generales
 - Accesos rápidos a todas las secciones
 
 ### Estados
+
 - Tabla interactiva de los 38 estados
 - Búsqueda y filtrado por código/nombre
 - Clasificación por tipos (Inicial, Exploración, Formulario, Pago, Final)
 - Indicadores de estados finales
 
 ### Recorridos Base
+
 - Visualización de 60 recorridos reales
 - Información del perfil de usuario y objetivo
 - Resultados (Éxito, Abandono, Error, Seguimiento)
 - Secuencia de estados transitados
 
 ### Matriz de Transición
+
 - Matriz de Conteos - número de transiciones
 - Matriz de Probabilidades - probabilidades normalizadas
 - Visualización con mapa de calor (heatmap)
 - Navegación entre estados clara
 
 ### Simulación
+
 - Parámetros personalizables:
   - Número de usuarios (default: 1000)
   - Máximo de pasos (default: 30)
@@ -148,18 +155,21 @@ npm run dev
 - Resultados detallados de simulaciones
 
 ### Gráficos de Análisis
+
 - Distribución de resultados (Pie chart)
 - Distribución de pasos (Bar chart)
 - Estadísticas descriptivas
 - Múltiples vistas interactivas
 
 ### Diagnóstico
+
 - Identificación automática del estado crítico
 - Tasa de abandono por estado
 - Análisis de usuarios afectados
 - Recomendaciones de mejora
 
 ### Comparación de Escenarios
+
 - Escenario actual vs. escenario mejorado
 - Comparación de métricas en gráficos
 - Cuantificación de mejoras potenciales
@@ -170,18 +180,21 @@ npm run dev
 ### Endpoints Principales
 
 #### Estados
+
 ```
 GET /api/estados
 Retorna: Lista de 38 estados con código, nombre, tipo, descripción
 ```
 
 #### Recorridos
+
 ```
 GET /api/recorridos
 Retorna: Lista de 60 recorridos base con perfil, objetivo, resultado
 ```
 
 #### Matrices
+
 ```
 GET /api/matriz/conteos
 Retorna: Matriz 38x38 con conteos de transiciones
@@ -191,6 +204,7 @@ Retorna: Matriz 38x38 con probabilidades normalizadas
 ```
 
 #### Simulación
+
 ```
 POST /api/simular
 Body: {
@@ -203,6 +217,7 @@ Retorna: Resultados de simulación con conteos y estadísticas
 ```
 
 #### Diagnóstico
+
 ```
 POST /api/diagnostico
 Body: {
@@ -213,6 +228,7 @@ Retorna: Estado crítico, causas, recomendaciones
 ```
 
 #### Comparación
+
 ```
 POST /api/comparar-escenarios
 Body: {
@@ -223,6 +239,7 @@ Retorna: Comparativa de escenarios actual vs mejorado
 ```
 
 #### Metadata
+
 ```
 GET /api/metadata
 Retorna: Información del proyecto, versión, configuración
@@ -231,6 +248,7 @@ Retorna: Información del proyecto, versión, configuración
 ## 📦 Variables de Entorno
 
 ### Backend (.env)
+
 ```
 DEBUG=False
 LOG_LEVEL=INFO
@@ -238,12 +256,14 @@ CORS_ORIGINS=["http://localhost:5173", "https://colombia-comparte.netlify.app"]
 ```
 
 ### Frontend (.env.development)
+
 ```
 VITE_API_URL=http://localhost:8000
 VITE_APP_NAME=Colombia Comparte Dashboard
 ```
 
 ### Frontend (.env.production)
+
 ```
 VITE_API_URL=https://colombia-comparte-api.onrender.com
 VITE_APP_NAME=Colombia Comparte Dashboard
@@ -261,6 +281,7 @@ VITE_APP_NAME=Colombia Comparte Dashboard
    - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port 8000`
 
 3. **Variables de Entorno**
+
    ```
    CORS_ORIGINS=["https://colombia-comparte.netlify.app"]
    ```
@@ -280,6 +301,7 @@ VITE_APP_NAME=Colombia Comparte Dashboard
    - Publish Directory: `dist`
 
 4. **Environment Variables**
+
    ```
    VITE_API_URL=https://colombia-comparte-api.onrender.com
    ```
@@ -287,6 +309,7 @@ VITE_APP_NAME=Colombia Comparte Dashboard
 5. **Deploy** - Netlify desplegará automáticamente
 
 ### URLs Finales
+
 - **Frontend**: https://colombia-comparte.netlify.app
 - **Backend API**: https://colombia-comparte-api.onrender.com
 - **Docs API**: https://colombia-comparte-api.onrender.com/docs
@@ -357,6 +380,7 @@ colombia-comparte-dashboard/
 ## 📈 Métricas y KPIs
 
 El dashboard monitorea:
+
 - **Total de Estados**: 38
 - **Total de Recorridos Base**: 60
 - **Estados Finales**: 4 (S34, S35, S36, S37)
@@ -367,24 +391,28 @@ El dashboard monitorea:
 ## 🐛 Troubleshooting
 
 ### El backend no conecta
+
 ```
 Error: Connection refused
 Solución: Verificar que el backend esté corriendo en terminal separada
 ```
 
 ### CORS errors
+
 ```
 Error: Access to XMLHttpRequest blocked
 Solución: Verificar CORS_ORIGINS en backend/.env
 ```
 
 ### Puerto ya en uso
+
 ```
 Error: Port 8000 already in use
 Solución: Cambiar puerto: uvicorn app.main:app --port 8001
 ```
 
 ### Dependencias faltantes
+
 ```
 Error: ModuleNotFoundError
 Solución: pip install -r requirements.txt (con entorno virtual activado)
@@ -401,11 +429,12 @@ Solución: pip install -r requirements.txt (con entorno virtual activado)
 
 ## 📝 Licencia
 
-Proyecto Integrador - Universidad Nacional de Colombia
+Proyecto Integrador - Universidad Santo Tomas
 
 ## 📞 Soporte
 
 Para preguntas o problemas, contactar a los desarrolladores del proyecto:
+
 - Daniel Esteban Alarcón Rojas
 - Juan Esteban Silva Espejo
 - Nelson Felipe González Gordillo

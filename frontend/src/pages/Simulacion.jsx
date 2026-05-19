@@ -13,6 +13,26 @@ export default function Simulacion() {
   const params = useSimulationStore()
 
   const handleSimular = async () => {
+    // Validate parameters before executing
+    const validate = () => {
+      if (!params) return false
+      if (params.numUsuarios < 1 || params.numUsuarios > 10000) {
+        toast.show('Número de usuarios debe estar entre 1 y 10,000', 'error')
+        return false
+      }
+      if (params.maxPasos < 1 || params.maxPasos > 1000) {
+        toast.show('Máximo de pasos debe estar entre 1 y 1,000', 'error')
+        return false
+      }
+      if (!params.estadoInicial) {
+        toast.show('Selecciona un estado inicial', 'error')
+        return false
+      }
+      return true
+    }
+
+    if (!validate()) return
+
     setLoading(true)
     setError(null)
     try {
@@ -178,7 +198,7 @@ export default function Simulacion() {
                 <input
                   type="number"
                   value={params.numUsuarios}
-                  onChange={(e) => useSimulationStore.setState({ numUsuarios: Math.max(1, parseInt(e.target.value) || 1) })}
+                  onChange={(e) => useSimulationStore.setState({ numUsuarios: Math.min(10000, Math.max(1, parseInt(e.target.value) || 1)) })}
                   disabled={loading}
                   className="input-field"
                   min="1"
@@ -193,7 +213,7 @@ export default function Simulacion() {
                 <input
                   type="number"
                   value={params.maxPasos}
-                  onChange={(e) => useSimulationStore.setState({ maxPasos: Math.max(1, parseInt(e.target.value) || 1) })}
+                  onChange={(e) => useSimulationStore.setState({ maxPasos: Math.min(1000, Math.max(1, parseInt(e.target.value) || 1)) })}
                   disabled={loading}
                   className="input-field"
                   min="1"
@@ -238,7 +258,7 @@ export default function Simulacion() {
                     Simulando...
                   </span>
                 ) : (
-                  '⚡ Ejecutar Simulación'
+                  'Ejecutar simulación'
                 )}
               </button>
 
