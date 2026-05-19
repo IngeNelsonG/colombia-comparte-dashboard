@@ -191,7 +191,15 @@ export default function Dashboard({ onNavigate }) {
             </div>
 
             <div className="mt-4 text-sm text-slate-600">
-              Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos tras aplicar filtros
+              {source === 'live' ? (
+                <div>
+                  Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de <strong>Live API</strong> tras aplicar filtros
+                </div>
+              ) : (
+                <div>
+                  Mostrando <strong>{filteredDataset.length}</strong> de <strong>{dataset.length}</strong> recorridos de la <strong>simulación {new Date(savedList.find(s => String(s.id) === String(source))?.timestamp).toLocaleString()}</strong> tras aplicar filtros
+                </div>
+              )}
             </div>
           </div>
         
@@ -280,7 +288,7 @@ export default function Dashboard({ onNavigate }) {
             </li>
             <li className="flex items-start gap-3">
               <span className="text-brand-600 font-bold mt-1">•</span>
-              <span><strong>Simulaciones</strong> monte carlo para validar comportamientos</span>
+              <span><strong>Simulaciones</strong> para validar comportamientos</span>
             </li>
           </ul>
         </div>

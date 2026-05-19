@@ -112,7 +112,7 @@ export default function Recorridos() {
             placeholder="Buscar por perfil u objetivo..."
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
-            className="input-field pl-12"
+            className="input-field pl-14 pr-4"
           />
         </div>
       </div>
