@@ -24,7 +24,7 @@ export default function Estados() {
 
   const estadosFiltrados = useMemo(() => estados.filter(e => {
     const matchesBusqueda = (e.codigo || '').toLowerCase().includes(filtro.toLowerCase()) ||
-                           (e.nombre || '').toLowerCase().includes(filtro.toLowerCase())
+      (e.nombre || '').toLowerCase().includes(filtro.toLowerCase())
     const matchesTipo = !tipoFiltro || e.tipo === tipoFiltro
     return matchesBusqueda && matchesTipo
   }), [estados, filtro, tipoFiltro])
@@ -51,13 +51,56 @@ export default function Estados() {
     })
     return map
   }, [estados])
-  
+
   const colorByType = {
     'Inicial': { bg: 'from-green-50 to-green-100', text: 'text-green-700', badge: 'bg-green-100 text-green-700' },
     'Exploración': { bg: 'from-blue-50 to-blue-100', text: 'text-blue-700', badge: 'bg-blue-100 text-blue-700' },
     'Formulario': { bg: 'from-purple-50 to-purple-100', text: 'text-purple-700', badge: 'bg-purple-100 text-purple-700' },
     'Pago': { bg: 'from-amber-50 to-amber-100', text: 'text-amber-700', badge: 'bg-amber-100 text-amber-700' },
     'Final': { bg: 'from-red-50 to-red-100', text: 'text-red-700', badge: 'bg-red-100 text-red-700' },
+  }
+
+  const getCategoriaEvaluativa = (estado) => {
+    const codigo = estado.codigo
+    const tipo = estado.tipo || ''
+    const nombre = `${estado.nombre || ''} ${estado.descripcion || ''}`.toLowerCase()
+
+    if (tipo === 'Inicial') return 'Inicial'
+
+    if (codigo === 'S37' || nombre.includes('éxito') || nombre.includes('exito')) {
+      return 'Final exitoso'
+    }
+
+    if (codigo === 'S35' || nombre.includes('abandono')) {
+      return 'Final negativo'
+    }
+
+    if (codigo === 'S36' || nombre.includes('error')) {
+      return 'Error'
+    }
+
+    if (
+      codigo === 'S34' ||
+      nombre.includes('seguimiento') ||
+      nombre.includes('pendiente')
+    ) {
+      return 'Seguimiento'
+    }
+
+    return 'Intermedio'
+  }
+
+  const getColorCategoriaEvaluativa = (categoria) => {
+    const colores = {
+      Inicial: 'bg-green-100 text-green-700',
+      Intermedio: 'bg-slate-100 text-slate-700',
+      'Final exitoso': 'bg-emerald-100 text-emerald-700',
+      'Final negativo': 'bg-red-100 text-red-700',
+      Error: 'bg-amber-100 text-amber-700',
+      Seguimiento: 'bg-blue-100 text-blue-700',
+    }
+
+    return colores[categoria] || 'bg-slate-100 text-slate-700'
   }
 
   return (
@@ -89,9 +132,8 @@ export default function Estados() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setTipoFiltro('')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-              !tipoFiltro ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${!tipoFiltro ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
           >
             <Filter size={16} className="inline mr-2" />
             Todos
@@ -100,11 +142,10 @@ export default function Estados() {
             <button
               key={tipo}
               onClick={() => setTipoFiltro(tipoFiltro === tipo ? '' : tipo)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-                tipoFiltro === tipo 
-                  ? 'bg-brand-600 text-white' 
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${tipoFiltro === tipo
+                ? 'bg-brand-600 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
             >
               {tipo} ({conteoPorTipo[tipo] || 0})
             </button>
@@ -121,9 +162,9 @@ export default function Estados() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {estadosFiltrados.map(estado => {
           const colors = colorByType[estado.tipo] || { bg: 'from-slate-50 to-slate-100', text: 'text-slate-700', badge: 'bg-slate-100 text-slate-700' }
-          
+
           return (
-            <div 
+            <div
               key={estado.codigo}
               className={`card-base p-4 sm:p-6 bg-gradient-to-br ${colors.bg} border-l-4 border-brand-500 hover:shadow-md transition-all`}
             >
@@ -145,10 +186,18 @@ export default function Estados() {
               </div>
 
               {/* Badges */}
+
               <div className="flex flex-wrap gap-2 mb-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colors.badge}`}>
-                  {estado.tipo}
+                  Tipo interno: {estado.tipo}
                 </span>
+
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${getColorCategoriaEvaluativa(getCategoriaEvaluativa(estado))}`}
+                >
+                  Categoría evaluativa: {getCategoriaEvaluativa(estado)}
+                </span>
+
                 {estado.es_final && (
                   <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
                     Estado Final

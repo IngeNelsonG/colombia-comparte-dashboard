@@ -99,9 +99,9 @@ export default function Simulacion() {
       try {
         const res = await apiService.getEstados()
         const map = {}
-        ;(res.data || []).forEach((estado) => {
-          map[estado.codigo] = estado.nombre
-        })
+          ; (res.data || []).forEach((estado) => {
+            map[estado.codigo] = estado.nombre
+          })
         setEstadoNombres(map)
       } catch (e) {
         console.error('No se pudieron cargar los nombres de estados', e)
@@ -128,6 +128,77 @@ export default function Simulacion() {
       .split(/\s*(?:→|->)\s*/)
       .map((s) => s.trim())
       .filter(Boolean)
+  }
+
+  const normalizarRecorrido = (recorrido) => {
+    if (!recorrido) return []
+
+    if (Array.isArray(recorrido)) {
+      return recorrido.map(String)
+    }
+
+    if (typeof recorrido === 'string') {
+      return parseRouteCodes(recorrido)
+    }
+
+    if (Array.isArray(recorrido.estados)) {
+      return recorrido.estados.map(String)
+    }
+
+    if (Array.isArray(recorrido.recorrido)) {
+      return recorrido.recorrido.map(String)
+    }
+
+    if (Array.isArray(recorrido.ruta)) {
+      return recorrido.ruta.map(String)
+    }
+
+    if (typeof recorrido.estados === 'string') {
+      return parseRouteCodes(recorrido.estados)
+    }
+
+    if (typeof recorrido.recorrido === 'string') {
+      return parseRouteCodes(recorrido.recorrido)
+    }
+
+    if (typeof recorrido.ruta === 'string') {
+      return parseRouteCodes(recorrido.ruta)
+    }
+
+    return []
+  }
+
+  const obtenerResultadoFinal = (recorrido) => {
+    const resultadoDirecto =
+      recorrido?.resultado ||
+      recorrido?.resultado_final ||
+      recorrido?.estado_final ||
+      recorrido?.final
+
+    if (resultadoDirecto) return resultadoDirecto
+
+    const codigos = normalizarRecorrido(recorrido)
+    const ultimoEstado = codigos[codigos.length - 1]
+
+    const resultadosPorEstadoFinal = {
+      S34: 'Seguimiento pendiente',
+      S35: 'Abandono',
+      S36: 'Error',
+      S37: 'Éxito',
+    }
+
+    if (resultadosPorEstadoFinal[ultimoEstado]) {
+      return resultadosPorEstadoFinal[ultimoEstado]
+    }
+
+    const nombreEstado = estadoNombres[ultimoEstado] || ''
+
+    if (/éxito|exito/i.test(nombreEstado)) return 'Éxito'
+    if (/abandono|negativo/i.test(nombreEstado)) return 'Abandono'
+    if (/error/i.test(nombreEstado)) return 'Error'
+    if (/seguimiento|pendiente/i.test(nombreEstado)) return 'Seguimiento pendiente'
+
+    return ultimoEstado ? `Finaliza en ${ultimoEstado}` : 'No disponible'
   }
 
   const openFrequentRouteModal = (item) => {
@@ -182,7 +253,7 @@ export default function Simulacion() {
 
       {/* Main Layout - Improved alignment */}
       <div className="grid md:grid-cols-3 gap-6 lg:gap-8 items-start animate-fade-in">
-        
+
         {/* LEFT: Parámetros */}
         <div className="md:col-span-1">
           <div className="card-base p-6 md:sticky md:top-32">
@@ -190,7 +261,7 @@ export default function Simulacion() {
               <Zap size={24} className="text-brand-600" />
               <h2 className="text-xl font-display font-bold text-slate-900">Parámetros</h2>
             </div>
-            
+
             <div className="space-y-5">
               {/* Num Usuarios */}
               <div>
@@ -330,10 +401,10 @@ export default function Simulacion() {
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
-            
+
             {resultado ? (
               <div className="space-y-6">
-                
+
                 {/* Resumen superior - Cards */}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
@@ -395,6 +466,73 @@ export default function Simulacion() {
                   </div>
                 </div>
 
+                {/* Vista previa de usuarios simulados */}
+                {(resultado.recorridos || []).length > 0 && (
+                  <div className="border-t border-slate-200 pt-6">
+                    <h3 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                      <CheckCircle size={18} className="text-brand-600" />
+                      Vista previa de usuarios simulados
+                    </h3>
+
+                    <p className="text-sm text-slate-600 mb-4">
+                      Se muestran algunos usuarios generados por la simulación, el recorrido realizado y el resultado final obtenido.
+                    </p>
+
+                    <div className="overflow-x-auto rounded-xl border border-slate-200">
+                      <table className="min-w-full text-sm">
+                        <thead className="bg-slate-100 text-slate-700">
+                          <tr>
+                            <th className="px-4 py-3 text-left font-semibold">Usuario</th>
+                            <th className="px-4 py-3 text-left font-semibold">Recorrido simulado</th>
+                            <th className="px-4 py-3 text-left font-semibold">Resultado final</th>
+                            <th className="px-4 py-3 text-left font-semibold">Pasos</th>
+                          </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-slate-100 bg-white">
+                          {(resultado.recorridos || []).slice(0, 10).map((recorrido, index) => {
+                            const codigos = normalizarRecorrido(recorrido)
+                            const resultadoFinal = obtenerResultadoFinal(recorrido)
+
+                            return (
+                              <tr key={`usuario-simulado-${index}`} className="hover:bg-slate-50">
+                                <td className="px-4 py-3 font-medium text-slate-900">
+                                  Usuario {index + 1}
+                                </td>
+
+                                <td className="px-4 py-3 font-mono text-xs text-slate-700 max-w-xl">
+                                  {codigos.length > 0 ? codigos.join(' → ') : 'Recorrido no disponible'}
+                                </td>
+
+                                <td className="px-4 py-3">
+                                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${resultadoFinal === 'Éxito'
+                                      ? 'bg-green-100 text-green-700'
+                                      : resultadoFinal === 'Abandono'
+                                        ? 'bg-red-100 text-red-700'
+                                        : resultadoFinal === 'Error'
+                                          ? 'bg-amber-100 text-amber-700'
+                                          : 'bg-blue-100 text-blue-700'
+                                    }`}>
+                                    {resultadoFinal}
+                                  </span>
+                                </td>
+
+                                <td className="px-4 py-3 text-slate-700">
+                                  {codigos.length}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p className="text-xs text-slate-500 mt-3">
+                      Vista previa limitada a los primeros 10 usuarios para mantener legible la interfaz.
+                    </p>
+                  </div>
+                )}
+
                 {/* Recorridos Frecuentes */}
                 {(resultado.recorridos_frecuentes || []).length > 0 && (
                   <div className="border-t border-slate-200 pt-6">
@@ -416,7 +554,7 @@ export default function Simulacion() {
                           </div>
                           <div className="ml-4 flex items-center gap-3 flex-shrink-0">
                             <div className="w-32 bg-slate-200 rounded-full h-2 overflow-hidden">
-                              <div 
+                              <div
                                 className="bg-gradient-to-r from-brand-500 to-brand-600 h-full rounded-full transition-all"
                                 style={{ width: `${(item.frecuencia / (resultado.usuarios ?? 1)) * 100}%` }}
                               />
