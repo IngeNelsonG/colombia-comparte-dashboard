@@ -35,7 +35,7 @@ export default function Recorridos() {
       try {
         const res = await apiService.getEstados()
         const map = {}
-        ;(res.data || []).forEach(e => { map[e.codigo] = e.nombre })
+          ; (res.data || []).forEach(e => { map[e.codigo] = e.nombre })
         setEstadoNombres(map)
       } catch (e) {
         console.error('Error loading estados', e)
@@ -104,15 +104,21 @@ export default function Recorridos() {
       </div>
 
       {/* Search */}
+
       <div className="card-base p-4 sm:p-6">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+        <div className="relative w-full">
+          <Search
+            size={20}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
+            aria-hidden="true"
+          />
+
           <input
             type="text"
             placeholder="Buscar por perfil u objetivo..."
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
-            className="input-field pl-14 pr-4"
+            className="input-field w-full !pl-12 pr-4"
           />
         </div>
       </div>
@@ -126,7 +132,7 @@ export default function Recorridos() {
       <div className="space-y-4">
         {recorridosFiltrados.map((r, idx) => {
           const colors = coloresResultado[r.resultado] || { bg: 'from-slate-50 to-slate-100', badge: 'bg-slate-100 text-slate-700', text: 'text-slate-700' }
-          
+
           return (
             <div key={r.id} className={`card-base bg-gradient-to-r ${colors.bg} p-4 sm:p-6 hover:shadow-md transition-all border-l-4 border-brand-500`}>
               {/* Top Row */}
@@ -149,7 +155,7 @@ export default function Recorridos() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4 text-sm sm:text-right flex-shrink-0">
                   <div>
                     <p className="text-xs text-slate-600 uppercase tracking-wide">Pasos</p>
@@ -164,12 +170,12 @@ export default function Recorridos() {
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Ruta:</p>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-1.5 min-w-0">
-                      { (r.estados || r.recorrido?.split(/\s*(?:→|->)\s*/)).slice(0,6).map((estado, i) => (
+                      {(r.estados || r.recorrido?.split(/\s*(?:→|->)\s*/)).slice(0, 6).map((estado, i) => (
                         <div key={i} className="flex items-center gap-1">
                           <span className="px-2 py-1 bg-white bg-opacity-60 text-slate-700 rounded text-xs font-mono font-semibold hover:bg-opacity-100 transition-all">
                             {estado}
                           </span>
-                          {i < Math.min((r.estados || r.recorrido.split(/\s*(?:→|->)\s*/)).length,6) - 1 && (
+                          {i < Math.min((r.estados || r.recorrido.split(/\s*(?:→|->)\s*/)).length, 6) - 1 && (
                             <span className="text-slate-400 text-xs">→</span>
                           )}
                         </div>
@@ -213,7 +219,7 @@ export default function Recorridos() {
                 <div key={`${code}-${i}`} className="p-3 rounded-lg border border-slate-200 bg-white">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-mono font-semibold text-brand-700">{code}</span>
-                    <span className="text-sm text-slate-400">Paso {i+1}</span>
+                    <span className="text-sm text-slate-400">Paso {i + 1}</span>
                   </div>
                   <p className="text-sm text-slate-800 mt-1">{estadoNombres[code] || 'Nombre no disponible'}</p>
                 </div>
