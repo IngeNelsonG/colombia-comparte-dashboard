@@ -117,19 +117,14 @@ export default function Estados() {
 
       {/* Search & Filter */}
       <div className="card-base p-4 sm:p-6 space-y-4">
-        <div className="relative w-full">
-          <Search
-            size={20}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10"
-            aria-hidden="true"
-          />
-
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
           <input
             type="text"
             placeholder="Buscar por código o nombre..."
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
-            className="input-field w-full pl-12 pr-4"
+            className="input-field w-full !pl-12 pr-4"
           />
         </div>
 
